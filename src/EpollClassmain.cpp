@@ -22,7 +22,6 @@ const int BUFFER_LEN = 10;
 const int NO_EVENTS_WILL_HANDLE = 2;
 
 int main()
-
 {
    int  lnRetVal = 0;
    CEpoll lcEpoll(NO_EVENTS_WILL_HANDLE, PORT,BUFFER_LEN);

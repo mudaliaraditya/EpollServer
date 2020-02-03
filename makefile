@@ -1,17 +1,19 @@
 
 
 
-all : server.out client.out
+all :  bin/libEpoll.so  bin/server.out bin/client.out 
 
-server.out : EpollClassmain.cpp libEpoll.so
-	g++ -o server.out EpollClassmain.cpp -L. -lEpoll -Wl,-R. -g 2>CompilerError 
+bin/server.out : src/EpollClassmain.cpp
+	g++ -o bin/server.out src/EpollClassmain.cpp -Ihdr -Lbin -lEpoll -Wl,-R. -g 2>>CompilerError 
 
-libEpoll.so : EpollClass.cpp
-	g++ -o libEpoll.so  -fPIC -shared  EpollClass.cpp -g
+bin/libEpoll.so : src/EpollClass.cpp
+	g++ -o bin/libEpoll.so  -fPIC -shared  src/EpollClass.cpp -Ihdr -g 2>>CompilerError
 
-client.out : EpollClassclient.cpp
-	g++ -o client.out EpollClassclient.cpp
+bin/client.out : src/EpollClassclient.cpp
+	g++ -o bin/client.out src/EpollClassclient.cpp -Ihdr  2>>CompilerError
 
 clean :
-	rm *.out
-	rm *.so
+	rm bin/*.out
+	rm bin/*.so
+	rm CompilerError
+	touch CompilerError

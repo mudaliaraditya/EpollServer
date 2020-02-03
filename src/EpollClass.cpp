@@ -26,6 +26,18 @@ CEpoll::CEpoll(int nNoOfEvents,int nPort,int nBufferLen)
    m_nCurrentNoOfEvents = 0;
 }
 
+CEpoll::CEpoll(int nNoOfEvents,int nPort,int nBufferLen,bool bWithTryCatch) : CEpoll(nNoOfEvents,nPort,nBufferLen)
+{
+   if(bWithTryCatch)
+   {
+        if(Initialize())
+        {
+            throw -1;
+        }
+   }
+   throw -1;
+}
+
 
 int  CEpoll::Initialize()
 {
