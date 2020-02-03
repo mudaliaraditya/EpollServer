@@ -13,7 +13,7 @@ bin/client.out : src/EpollClassclient.cpp
 	g++ -o bin/client.out src/EpollClassclient.cpp -Ihdr  2>>CompilerError
 
 clean :
-	rm bin/*.out
-	rm bin/*.so
+	rm bin/*.out || true
+	rm bin/*.so || true
 	rm CompilerError
 	touch CompilerError
