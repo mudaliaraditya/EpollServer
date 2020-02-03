@@ -1,0 +1,8 @@
+src/EpollClass.cpp: In constructor ‘CEpoll::CEpoll(int, int, int, void* (*)(void*, CEpoll*))’:
+src/EpollClass.cpp:31:7: error: ‘bWithTryCatch’ was not declared in this scope
+    if(bWithTryCatch)
+       ^~~~~~~~~~~~~
+src/EpollClassclient.cpp: In function ‘int main(int, const char**)’:
+src/EpollClassclient.cpp:14:19: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
+     char *hello = "Hello from client";
+                   ^~~~~~~~~~~~~~~~~~~

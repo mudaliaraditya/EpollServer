@@ -18,7 +18,7 @@ class CEpoll
 {
    public:
       CEpoll(int nNoOfEvents,int nPort,int nBufferLen);
-      CEpoll(int nNoOfEvents,int nPort,int nBufferLen,bool bWithTryCatch);
+      CEpoll(int nNoOfEvents,int nPort,int nBufferLen,void*(*pFunc)(void*,CEpoll*));
       int Initialize();
       int CreateAServerSocket();
       int InitializeMemoryForEvents(); 

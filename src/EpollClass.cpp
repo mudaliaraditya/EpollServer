@@ -26,15 +26,20 @@ CEpoll::CEpoll(int nNoOfEvents,int nPort,int nBufferLen)
    m_nCurrentNoOfEvents = 0;
 }
 
-CEpoll::CEpoll(int nNoOfEvents,int nPort,int nBufferLen,bool bWithTryCatch) : CEpoll(nNoOfEvents,nPort,nBufferLen)
+CEpoll::CEpoll(int nNoOfEvents,int nPort,int nBufferLen,void*(*pFunc)(void*,CEpoll*)) : CEpoll(nNoOfEvents,nPort,nBufferLen)
 {
-   if(bWithTryCatch)
-   {
+   
+   
         if(Initialize())
         {
             throw -1;
         }
-   }
+        if(SetHandlerFunction(pFunc))
+        {
+            throw -1;
+        }
+        return;
+   
    throw -1;
 }
 
