@@ -7,43 +7,60 @@
 #include <iostream>
 #include <set>
 #include "EpollClass.h"
-
+#include <signal.h>
 using namespace std;
 
 
-int DummySimpleHandler(void* pBuffer,CEpoll* cExecutingObj)
+CEpoll* g_pcEpoll = nullptr;
+int DummySimpleHandler(void* pRequestBuffer,void* pResponseBuffer,CEpoll* cExecutingObj)
 {
-    
+   //write code to handle request data
+   cout << (char*)pRequestBuffer << endl;
+   //write on the buffer to send response
+   strncpy( (char*)pResponseBuffer,"Hello", 5);
    return 0;
 }
 
 const int PORT =  4176;
-const int BUFFER_LEN = 10;
+const int RECV_BUFFER_LEN = 17;
+const int SEND_BUFFER_LEN = 5;
 const int NO_EVENTS_WILL_HANDLE = 2;
+
+void handle_sigint(int sig) 
+{ 
+   printf("Caught signal %d\n", sig); 
+	g_pcEpoll->StopServer();
+   return;
+} 
+
 
 int main()
 {
    int  lnRetVal = 0;
-   CEpoll lcEpoll(NO_EVENTS_WILL_HANDLE, PORT,BUFFER_LEN);
-
-   lnRetVal = lcEpoll.Initialize();
+	signal(SIGINT, handle_sigint);
+   g_pcEpoll  =   new CEpoll(NO_EVENTS_WILL_HANDLE, PORT,RECV_BUFFER_LEN,SEND_BUFFER_LEN);
+   lnRetVal = g_pcEpoll->Initialize();
    if(lnRetVal != 0 )
    {
       cout << "error" << endl;
       return -1;
    }
 
-   lnRetVal = lcEpoll.SetHandlerFunction(DummySimpleHandler);
+   lnRetVal = g_pcEpoll->SetHandlerFunction(DummySimpleHandler);
    if(0 != lnRetVal)
    {
       cout << "error" << endl;
       return -1;
    }
 
-   lnRetVal = lcEpoll.StartEpollListener();
+   lnRetVal = g_pcEpoll->StartEpollListener();
    if(0 != lnRetVal)
    {
       cout << "error" << endl;
       return -1;
    }
+   delete g_pcEpoll;
+   g_pcEpoll = nullptr;
+   cout << "exiting..." << endl;
+   return 0;
 }

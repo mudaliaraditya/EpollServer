@@ -13,7 +13,7 @@
 #include "EpollClass.h"
 using namespace std;
 
-CEpoll::CEpoll(int nNoOfEvents,int nPort,int nBufferLen)
+CEpoll::CEpoll(int nNoOfEvents,int nPort,int nRecvBufferLen,int nSenderBufferLen)
 {
 	memset(&m_stEpEvent,0,sizeof(m_stEpEvent));
 	memset(&lstClientData,0,sizeof(lstClientData));
@@ -21,12 +21,15 @@ CEpoll::CEpoll(int nNoOfEvents,int nPort,int nBufferLen)
 	m_SockAddrStructLen = 0;
 	m_nNoOfEvents = nNoOfEvents;
 	m_nPort = nPort;
-	m_nBufferLen = nBufferLen;
-	m_cBuffer = new char[nBufferLen + 1];
+	m_nRecvBufferLen = nRecvBufferLen;
+	m_cRecvBuffer = new char[nRecvBufferLen + 1];
+   m_nSendBufferLen = nSenderBufferLen;
+   m_cSendBuffer = new char[nSenderBufferLen + 1];
 	m_nCurrentNoOfEvents = 0;
+	m_nRunning = 0;
 }
 
-CEpoll::CEpoll(int nNoOfEvents,int nPort,int nBufferLen,int (*pFunc)(void*,CEpoll*)) : CEpoll(nNoOfEvents,nPort,nBufferLen)
+CEpoll::CEpoll(int nNoOfEvents,int nPort,int nRecvBufferLen,int nSenderBufferLen,int (*pFunc)(void*,void*,CEpoll*)) : CEpoll(nNoOfEvents,nPort,nRecvBufferLen,nSenderBufferLen)
 { 
 	if(Initialize())
 	{
@@ -139,7 +142,8 @@ int  CEpoll::ListenSock()
 int  CEpoll::StartEpollListener()
 {
 	int lnRetVal = 0;
-	while(true)
+   m_nRunning = 1;
+	while(m_nRunning == 1)
 	{
       if(m_pFunc == NULL)
       {
@@ -169,7 +173,7 @@ int  CEpoll::StartEpollListener()
 			} else
 			{
 				//if connection is an old one it is checked if its a disconnect or a packet is recieved
-				int str_len=read(m_pstEpHolderEvent[i].data.fd, m_cBuffer, m_nBufferLen);
+				int str_len=read(m_pstEpHolderEvent[i].data.fd, m_cRecvBuffer, m_nRecvBufferLen);
 				if (str_len == 0)
 				{
 					m_nFDStore.erase(m_pstEpHolderEvent[i].data.fd);
@@ -179,19 +183,38 @@ int  CEpoll::StartEpollListener()
 				} else
 				{
 					m_nCurrentFD = m_pstEpHolderEvent[i].data.fd;
-					lnRetVal = m_pFunc(m_cBuffer,this);
+					lnRetVal = m_pFunc(m_cRecvBuffer,m_cSendBuffer,this);
 					if (lnRetVal != 0)
 					{
 						return -1;
 					}
+               else
+               {
+                 int lnTotalLen = m_nSendBufferLen;
+                 int lnBytesSent = 0;
+                 while(true)
+                 {
+                    lnBytesSent = send(m_nCurrentFD,m_cSendBuffer,lnTotalLen,0);
+                    if(lnTotalLen != lnBytesSent)
+                    {
+                      lnTotalLen - lnBytesSent; 
+                    }
+                    else
+                    {
+                       break;
+                    }
+                 }
+
+               }
 				}
+            memset(m_cRecvBuffer,0,m_nRecvBufferLen);
 			}
 		}            
 	}
 	return 0;
 }
 
-int   CEpoll::SetHandlerFunction(int (*pFunc)(void*,CEpoll*))
+int   CEpoll::SetHandlerFunction(int (*pFunc)(void*,void*,CEpoll*))
 {
 	m_pFunc = pFunc;
 	if(m_pFunc == NULL)
@@ -224,13 +247,21 @@ const set<int>&  CEpoll::GetFDStore()
 	return m_nFDStore;
 }
 
+void CEpoll::StopServer()
+{
+   m_nRunning = 0;
+}
+
 CEpoll::~CEpoll()
 {
-	delete[] m_cBuffer;
+	delete[] m_cRecvBuffer;
+	m_cRecvBuffer = nullptr;
+   delete[] m_cSendBuffer;
+   m_cSendBuffer = nullptr;
 	free(m_pstEpHolderEvent);
 }
 
-int   CEpoll::SimpleHandler(void* pBuffer,CEpoll* cExecutingObj)
+int   CEpoll::SimpleHandler(void* pRecvBuffer,void* pSendBuffer,CEpoll* cExecutingObj)
 {
 	return 0;
 }
