@@ -17,10 +17,10 @@ bin/libEpoll.a : src/EpollClass.cpp
 
 
 bin/client.out : example/EpollClassclient.cpp
-	g++ -o example/bin/client.out example/EpollClassclient.cpp -Ihdr  2>>CompilerError
+	g++ -o example/bin/client.out example/EpollClassclient.cpp -Ihdr
 
 clean :
 	rm bin/*.out || true
 	rm bin/*.so || true
-	rm CompilerError
-	touch CompilerError
+	rm bin/*.a || true
+	rm example/bin/* || true

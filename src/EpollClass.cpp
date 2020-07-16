@@ -26,7 +26,7 @@ CEpoll::CEpoll(int nNoOfEvents,int nPort,int nBufferLen)
 	m_nCurrentNoOfEvents = 0;
 }
 
-CEpoll::CEpoll(int nNoOfEvents,int nPort,int nBufferLen,void*(*pFunc)(void*,CEpoll*)) : CEpoll(nNoOfEvents,nPort,nBufferLen)
+CEpoll::CEpoll(int nNoOfEvents,int nPort,int nBufferLen,int (*pFunc)(void*,CEpoll*)) : CEpoll(nNoOfEvents,nPort,nBufferLen)
 { 
 	if(Initialize())
 	{
@@ -179,7 +179,7 @@ int  CEpoll::StartEpollListener()
 				} else
 				{
 					m_nCurrentFD = m_pstEpHolderEvent[i].data.fd;
-					m_pFunc(m_cBuffer,this);
+					lnRetVal = m_pFunc(m_cBuffer,this);
 					if (lnRetVal != 0)
 					{
 						return -1;
@@ -191,7 +191,7 @@ int  CEpoll::StartEpollListener()
 	return 0;
 }
 
-int   CEpoll::SetHandlerFunction(void*(*pFunc)(void*,CEpoll*))
+int   CEpoll::SetHandlerFunction(int (*pFunc)(void*,CEpoll*))
 {
 	m_pFunc = pFunc;
 	if(m_pFunc == NULL)
@@ -230,9 +230,9 @@ CEpoll::~CEpoll()
 	free(m_pstEpHolderEvent);
 }
 
-void*   CEpoll::SimpleHandler(void* pBuffer,CEpoll* cExecutingObj)
+int   CEpoll::SimpleHandler(void* pBuffer,CEpoll* cExecutingObj)
 {
-	return NULL;
+	return 0;
 }
 
 

@@ -18,7 +18,7 @@ class CEpoll
 {
    public:
       CEpoll(int nNoOfEvents,int nPort,int nBufferLen);
-      CEpoll(int nNoOfEvents,int nPort,int nBufferLen,void*(*pFunc)(void*,CEpoll*));
+      CEpoll(int nNoOfEvents,int nPort,int nBufferLen,int (*pFunc)(void*,CEpoll*));
       int Initialize();
       int CreateAServerSocket();
       int InitializeMemoryForEvents(); 
@@ -26,12 +26,12 @@ class CEpoll
       int BindSock();
       int ListenSock();
       int StartEpollListener();
-      int SetHandlerFunction(void*(*pFunc)(void*,CEpoll*));
+      int SetHandlerFunction(int (*pFunc)(void*,CEpoll*));
       int AddServerSockToEpoll();
       int GetCurrentFD(); 
       const std::set<int>& GetFDStore();
       ~CEpoll(); 
-      static void*  SimpleHandler(void* pBuffer,CEpoll* cExecutingObj);
+      static int  SimpleHandler(void* pBuffer,CEpoll* cExecutingObj);
       
    private:
 
@@ -46,7 +46,7 @@ class CEpoll
       struct epoll_event* m_pstEpHolderEvent;
       int                 m_nNoOfEvents;
       int                 m_nCurrentNoOfEvents;
-      void*               (*m_pFunc)(void*,CEpoll*);
+      int               (*m_pFunc)(void*,CEpoll*);
       struct sockaddr_in  m_stServerBindAddresStruct;
       socklen_t           m_SockAddrStructLen;
       int                 m_nPort;

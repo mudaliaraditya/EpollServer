@@ -11,10 +11,10 @@
 using namespace std;
 
 
-void*  TheSimpleHandler(void* pBuffer,CEpoll* cExecutingObj)
+int DummySimpleHandler(void* pBuffer,CEpoll* cExecutingObj)
 {
     
-   return NULL;
+   return 0;
 }
 
 const int PORT =  4176;
@@ -33,7 +33,7 @@ int main()
       return -1;
    }
 
-   lnRetVal = lcEpoll.SetHandlerFunction(TheSimpleHandler);
+   lnRetVal = lcEpoll.SetHandlerFunction(DummySimpleHandler);
    if(0 != lnRetVal)
    {
       cout << "error" << endl;
