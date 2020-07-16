@@ -27,6 +27,9 @@ Simplifies the task of handling request and response using Epoll for handling Mu
    pRequestBuffer - this will hold the request data buffer/information recieved from the client end
    pResponseBuffer - this buffer needs to be filled with the response
    cExecutingObj - if you want to handle/stop on some message
-    return 1 for sucess or -1 to exit application due to unrecoverable failure
+   
+   return 0 for sucess or -1 to exit application due to unrecoverable failure
 
+   feel free to raise issue/suggestions
+   mail:mudaliar.aditya@gmail.com
 
