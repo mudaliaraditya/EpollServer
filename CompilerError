@@ -1,4 +1,0 @@
-src/EpollClassclient.cpp: In function ‘int main(int, const char**)’:
-src/EpollClassclient.cpp:14:19: warning: ISO C++ forbids converting a string constant to ‘char*’ [-Wwrite-strings]
-     char *hello = "Hello from client";
-                   ^~~~~~~~~~~~~~~~~~~
