@@ -12,7 +12,9 @@
 #include <netinet/in.h>
 #include <iostream>
 #include <set>
-//using namespace std;
+#include <deque>
+#include "BoundedQueue.h"
+typedef std::pair<int,void* > Fd_Msg_Pair;
 
 class CEpoll
 {
@@ -21,28 +23,36 @@ class CEpoll
       CEpoll(int nNoOfEvents,int nPort,int nRecvBufferLen,int nSenderBufferLen,int (*pFunc)(void*,void*,CEpoll*));
       int Initialize();
       int CreateAServerSocket();
-      int InitializeMemoryForEvents(); 
+      int InitializeMemoryForEvents();
       int InitalizeEpFD();
       int BindSock();
       int ListenSock();
       int StartEpollListener();
       int SetHandlerFunction(int (*pFunc)(void*,void*,CEpoll*));
+		int SetVariableLenResponse(int nLen);
+		void SetResponseBuffer(char* pData,int nLen);
       int AddServerSockToEpoll();
       int GetCurrentFD(); 
       const std::set<int>& GetFDStore();
       void StopServer();
+	  #ifdef MULTITHREAD
+	  bool SenderThread();
+	  static void* InitateSenderThread(void* pData);
+	  #endif
       ~CEpoll(); 
       static int  SimpleHandler(void* pRecvBuffer,void* pSendBuffer,CEpoll* cExecutingObj);
       
+		bool                m_nRunning;
+      
    private:
 
-      struct sockaddr_in lstClientData;
+      struct sockaddr_in  lstClientData;
       int                 m_nRecvBufferLen;
       int                 m_nSendBufferLen;
       char*               m_cRecvBuffer;
       char*               m_cSendBuffer;
       int                 m_nSockFD;
-      int    m_nCurrentFD;
+      int                 m_nCurrentFD;
       std::set<int>       m_nFDStore;
       int                 m_nEpFD;
       struct epoll_event  m_stEpEvent;
@@ -53,7 +63,10 @@ class CEpoll
       struct sockaddr_in  m_stServerBindAddresStruct;
       socklen_t           m_SockAddrStructLen;
       int                 m_nPort;
-      bool                m_nRunning;
+		CBoundedQueue< Fd_Msg_Pair > m_cMsgs;
+	  #ifdef MULTITHREAD
+	  pthread_t           m_nSenderThread;
+	  #endif
 };
 
 
