@@ -17,7 +17,9 @@ int DummySimpleHandler(void* pRequestBuffer,void* pResponseBuffer,CEpoll* cExecu
    //write code to handle request data
    cout << (char*)pRequestBuffer << endl;
    //write on the buffer to send response
-   strncpy( (char*)pResponseBuffer,"Hello", 5);
+	static int x = 0;
+	snprintf((char*)pResponseBuffer,5,"Hi %d",x++);
+   //strncpy( (char*)pResponseBuffer,"Hello", 5);
    return 0;
 }
 
